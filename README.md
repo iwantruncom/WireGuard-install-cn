@@ -2,6 +2,8 @@
 
 > 本项目基于开源社区经典项目 [angristan/wireguard-install](https://github.com/angristan/wireguard-install) 进行二次开发。  
 > 更多 VPN 机场教程请访问：https://iwantrun.com/freevpn
+> 
+> 详细安装教程：https://iwantrun.com/vpn-proxy/17222.html
 
 ---
 
