@@ -32,10 +32,9 @@
 
 ## 📖 项目理念
 
-本脚本由 [自由档案馆](https://iwantrun.com/) 汉化与维护。
+本脚本由 [自由档案馆](https://iwantrun.com/) 汉化与维护，感谢 [张狗剩同志](https://x.com/goshenggo) 的催更。
 
 感谢原作者 [angristan](https://github.com/angristan) 的开源项目。  
-感谢 [张狗剩同志](https://x.com/goshenggo) 的催更。
 
 在一个信息被高墙阻隔、真相被选择性遮蔽的时代，工具本身也可以成为一种微小但具体的抵抗。
 
