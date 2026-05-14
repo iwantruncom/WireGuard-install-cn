@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# WireGuard 一键安装脚本（中文精简版）
-# 汉化：张狗剩（https://x.com/goshenggo）& 自由档案馆（https://iwantrun.com/）
+# WireGuard 一键安装脚本（中文版）
+# 汉化：自由档案馆（https://iwantrun.com/）
 # 原项目：https://github.com/angristan/wireguard-install
 
 RED='\033[0;31m'
@@ -100,18 +100,17 @@ function showQRCode() {
 	local CONF_FILE=$1
 	local PYTHON_CMD="python3"
 
-	# 检查 python 命令 (Arch Linux 等可能直接叫 python)
+	# 检查 python 命令
 	if ! command -v ${PYTHON_CMD} &>/dev/null; then
 		if command -v python &>/dev/null; then
 			PYTHON_CMD="python"
 		else
 			echo -e "  ${RED}无法生成二维码：未找到 Python 环境${NC}"
-			echo -e "  请将配置文件下载到电脑后手动导入 WireGuard 客户端"
 			return 1
 		fi
 	fi
 
-	# 尝试安装 qrcode 库 (静默执行，适配较新系统的 PEP 668 保护机制)
+	# 尝试安装 qrcode 库
 	if ! ${PYTHON_CMD} -c "import qrcode" 2>/dev/null; then
 		${PYTHON_CMD} -m pip install qrcode --quiet --break-system-packages 2>/dev/null || \
 		${PYTHON_CMD} -m pip install qrcode --quiet 2>/dev/null
@@ -143,7 +142,6 @@ PYSCRIPT
 		return 0
 	else
 		echo -e "  ${RED}无法生成二维码：qrcode 库安装失败${NC}"
-		echo -e "  请将配置文件下载到电脑后手动导入 WireGuard 客户端"
 		return 1
 	fi
 }
@@ -153,7 +151,7 @@ function installQuestions() {
 	echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 	echo -e "${GREEN}     WireGuard 一键安装脚本（中文版）${NC}"
 	echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-	echo -e "  汉化：张狗剩 & 自由档案馆"
+	echo -e "  汉化：自由档案馆｜iwantrun.com"
 	echo -e "  原项目：https://github.com/angristan/wireguard-install"
 	echo ""
 	echo -e "${ORANGE}【安全声明】${NC}"
@@ -300,10 +298,6 @@ PostDown = iptables -t nat -D POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE" >>
 
 	newClient
 
-	echo ""
-	echo -e "${GREEN}如需添加更多客户端，重新运行此脚本即可。${NC}"
-	echo ""
-
 	if [[ ${OS} == 'alpine' ]]; then
 		rc-service --quiet "wg-quick.${SERVER_WG_NIC}" status
 	else
@@ -314,10 +308,8 @@ PostDown = iptables -t nat -D POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE" >>
 	if [[ ${WG_RUNNING} -ne 0 ]]; then
 		echo -e "${RED}警告：WireGuard 未能正常启动。${NC}"
 		echo -e "${ORANGE}请执行：systemctl status wg-quick@${SERVER_WG_NIC}${NC}"
-		echo -e "${ORANGE}若提示找不到设备，重启服务器后重试。${NC}"
 	else
 		echo -e "${GREEN}WireGuard 已成功启动！${NC}"
-		echo -e "${ORANGE}若客户端无法上网，请重启服务器后再试。${NC}"
 	fi
 }
 
@@ -399,23 +391,31 @@ AllowedIPs = ${CLIENT_WG_IPV4}/32" >>"/etc/wireguard/${SERVER_WG_NIC}.conf"
 	echo -e "  \033[1;37;44m 服务器：${SERVER_PUB_IP}   端口：${SERVER_PORT}   客户端IP：${CLIENT_WG_IPV4} \033[0m"
 	echo ""
 	
-	# 官方下载链接
-	echo -e "  WireGuard客户端官方下载（Windows/macOS/Android/Linux）：https://www.wireguard.com/install/"
-	echo ""
-
-	echo -e "${ORANGE}📱 手机连接${NC}（App Store / Google Play 搜索 WireGuard，扫码导入）"
+	# 手机连接部分
+	echo -e "${ORANGE}📱 手机扫码下面二维码连接，需要安装WireGuard客户端。${NC}"
+	echo -e "  1、苹果手机 App Store需要切换其他国家商店或淘宝购买美区账号，搜索 WireGuard 下载即可。"
+	echo -e "  2、安卓手机 国内应用市场无法下载，通过官方链接下载APK安装。"
 	showQRCode "${CLIENT_CONF}"
 	echo ""
 
-	echo -e "${ORANGE}💻 电脑连接${NC}（下载配置文件后用 WireGuard 客户端导入）"
-	echo -e "  配置文件：${GREEN}${CLIENT_CONF}${NC}"
+	# 电脑连接部分
+	echo -e "${ORANGE}💻 电脑连接（下载配置文件后用 WireGuard 客户端导入）${NC}"
+	echo -e "  配置文件位置：${GREEN}${CLIENT_CONF}${NC}"
 	echo ""
-	echo -e "  Mac 终端执行："
+	echo -e "  Mac 终端执行（执行命令会将配置文件下载到电脑的下载目录里面）："
 	echo -e "  ${GREEN}scp root@${SERVER_PUB_IP}:${CLIENT_CONF} ~/Downloads/${NC}"
 	echo ""
 	echo -e "  Windows 下载："
-	echo -e "  · WinSCP（推荐新手）：https://winscp.net  登录后找到上方路径拖出即可"
-	echo -e "  · PowerShell：scp root@${SERVER_PUB_IP}:${CLIENT_CONF} %USERPROFILE%\Downloads\ "
+	echo -e "  · WinSCP（推荐新手）：https://winscp.net 登录后服务器账号密码以后，找到上方路径下载到本地电脑即可"
+	echo -e "  · PowerShell（下载到本地电脑的下载目录）："
+	echo -e "    ${GREEN}scp root@${SERVER_PUB_IP}:${CLIENT_CONF} \$env:USERPROFILE\\Downloads\\${NC}"
+	
+	echo ""
+	echo -e "  WireGuard 客户端官方下载（Windows/macOS/Android/Linux）："
+	echo -e "  https://www.wireguard.com/install/"
+	echo ""
+	echo -e "  ${ORANGE}执行 ./wireguard-install-cn.sh 打开管理菜单${NC}"
+	echo -e "  ${GREEN}获取更多VPN翻墙教程，请访问自由档案馆：https://iwantrun.com/freevpn${NC}"
 	echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 }
 
@@ -518,7 +518,7 @@ function manageMenu() {
 	echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 	echo -e "${GREEN}        WireGuard 管理菜单${NC}"
 	echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-	echo -e "  汉化：张狗剩 & 自由档案馆"
+	echo -e "  汉化：自由档案馆，感谢张狗剩同志催更。"
 	echo -e "  原项目：https://github.com/angristan/wireguard-install"
 	echo ""
 	echo -e "${ORANGE}【安全声明】${NC}"
